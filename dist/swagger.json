@@ -1,0 +1,564 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de cadastro e login de usuario e manipulação de recados",
+        "description": "Essa API tem o objetivo de fornecer ao usuario a opção de criar e logar em um perfil e manipular recados nele.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:9009",
+            "description": "API de teste"
+        },
+        {
+            "url": "taskedtask-back-end.onrender.com",
+            "description": "API de produção"
+        }
+    ],
+    "paths": {
+        "/user": {
+            "post": {
+                "summary": "Cadastro de usuarios",
+                "description": "Essa rota será responsável por cadastros um novo usuário",
+                "tags": ["Users"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            },
+                            "examples": {
+                                "user": {
+                                    "value": {
+                                        "firstName": "John",
+                                        "lastName": "Doe",
+                                        "email": "john@doe.com",
+                                        "password": "john2345",
+                                        "passwordConfirm": "john2345"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "summary": "Busca de um usuário pelo id",
+                "description": "Essa rota será responsável por buscar um usuário existente pelo id",
+                "tags": ["Users"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Usuário pelo ID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/Response"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth": {
+            "post": {
+                "summary": "Criação da sessão do usuário",
+                "description": "Essa rota será responsável por criar uma sessão de login para o usuário",
+                "tags": ["Auth"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserAuth"
+                            },
+                            "examples": {
+                                "user": {
+                                    "value": {
+                                        "email": "john@doe.com",
+                                        "password": "john2345"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseAuth"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/messages/{userId}/{id}": {
+            "put": {
+                "summary": "Edita o recado pelo id do usuario e do recado",
+                "description": "Essa rota será responsável por buscar o recado existente do usuario e editar",
+                "tags": ["Errands"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID do usuario por parametro",
+                        "required": true
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do recado por parametro",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Messages"
+                            },
+                            "examples": {
+                                "user": {
+                                    "value": {
+                                        "id": "fee033fc-73ad-4610-94cf-d89ca8229932",
+                                        "message": "Meu primeiro recado alterado",
+                                        "userId": "40863b80-aa9f-4b87-9bbe-d327029e8301"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrandsGet"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrandsGet"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/messages/{id}": {
+            "delete": {
+                "summary": "Deletar recado",
+                "description": "Essa rota será responsável por deletar recado pelo id",
+                "tags": ["Errands"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do recado por parametro",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/messages/{userId}": {
+            "post": {
+                "summary": "Criação de um recado para o usuário",
+                "description": "Essa rota será responsável por criar um recado para o usuário",
+                "tags": ["Errands"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID do usuario por parametro",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Messages"
+                            },
+                            "examples": {
+                                "user": {
+                                    "value": {
+                                        "id": "",
+                                        "message": "Meu primeiro recado",
+                                        "userId": ""
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrands"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrands"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "summary": "Busca os recados do usuário",
+                "description": "Essa rota será responsável por buscar todos os recados de um usuário existente",
+                "tags": ["Errands"],
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID do usuario por parametro",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sucess",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrandsGet"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "An Error Occurred, Please Try Again Later"
+                    },
+                    "400": {
+                        "description": "Error: Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseErrandsGet"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/ResponseMiddle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Messages": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "passwordConfirm": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Response": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/User"
+                    }
+                }
+            },
+            "ResponseErrands": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "object"
+                    },
+                    "data": {
+                        "type": "object"
+                    }
+                }
+            },
+            "ResponseErrandsGet": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean"
+                    },
+                    "data": {
+                        "type": "array",
+                        "$ref": "#/components/schemas/Messages"
+                    }
+                }
+            },
+            "ResponseMiddle": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UserAuth": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ResponseAuth": {
+                "type": "object",
+                "properties": {
+                    "ok": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "token": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/User"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

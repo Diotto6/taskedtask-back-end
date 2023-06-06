@@ -16,16 +16,16 @@ class UserController {
         const user = service.find((user) => user.id === id);
         try {
             if (user) {
-                return response.json({
+                return response.status(constants_1.httpSucessCode).json({
                     ok: true,
-                    message: "",
+                    message: "Dados do usuário buscado com sucesso",
                     data: {
                         user,
                     }
                 });
             }
             else {
-                return response.json({
+                return response.status(constants_1.HttpBadRequestCode).json({
                     ok: false,
                     message: "Erro ao buscar dados do usuario",
                     data: {}
@@ -37,7 +37,7 @@ class UserController {
         }
     }
     async store(request, response) {
-        const { firstName, lastName, email, password, passwordConfirm } = request.body.data;
+        const { firstName, lastName, email, password, passwordConfirm } = request.body.data || request.body;
         const service = new repositories_1.UserRepository();
         try {
             const user = await service.create({
@@ -47,25 +47,23 @@ class UserController {
                 password: password,
                 passwordConfirm: passwordConfirm,
             });
-            return response
-                .json({
+            return response.status(constants_1.httpCreatedCode).json({
                 ok: true,
                 message: "Conta cadastrada com sucesso",
                 data: { user }
-            })
-                .status(constants_1.httpCreatedCode);
+            });
         }
         catch (error) {
             throw new errors_1.HttpError(constants_1.defaultErrorMessage, constants_1.HttpInternalErrorCode);
         }
     }
     async authenticate(request, response) {
-        const { email } = request.body.data;
+        const { email } = request.body.data || request.body;
         const service = await entities_1.UserEntity.find({ where: { email: email } });
         const user = service.find((user) => user.email === email);
         try {
             const token = jsonwebtoken_1.default.sign({ id: user?.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES });
-            return response.json({
+            return response.status(constants_1.httpSucessCode).json({
                 ok: true,
                 email,
                 message: "Logado com sucesso!",

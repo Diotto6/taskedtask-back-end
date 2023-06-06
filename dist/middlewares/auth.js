@@ -9,9 +9,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 function authMiddleware(request, response, next) {
     const { authorization } = request.headers;
     if (!authorization) {
-        return response
-            .json({ message: "Não autorizado(a)", ok: false })
-            .sendStatus(constants_1.HttpUnauthorized);
+        return response.status(constants_1.HttpUnauthorized).json({ message: "Não autorizado(a)", ok: false });
     }
     const token = authorization.replace("Bearer", "").trim();
     try {
@@ -21,7 +19,7 @@ function authMiddleware(request, response, next) {
         next();
     }
     catch {
-        return response.sendStatus(constants_1.HttpUnauthorized);
+        return response.status(constants_1.HttpUnauthorized);
     }
 }
 exports.authMiddleware = authMiddleware;

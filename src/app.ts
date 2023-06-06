@@ -1,9 +1,7 @@
 import 'reflect-metadata'
 
 import express, { Request, Response, NextFunction } from 'express'
-import swaggerUi from 'swagger-ui-express'
 import cors from 'cors'
-import swaggerDocs from './swagger.json'
 import NewRoutes from './routers/new'
 import Database from './database/connections/Database'
 import { HttpError } from './errors'
@@ -31,7 +29,6 @@ export default class Application {
   private config() {
     this.#express.use(express.json())
     this.#express.use(express.urlencoded({ extended: false }))
-    this.#express.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs))
     this.#express.use(cors())
   }
 
