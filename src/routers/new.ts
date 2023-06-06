@@ -6,6 +6,7 @@ import UserController from "../controllers/user";
 import MensagensController from "../controllers/errands";
 import { authMiddleware, checkRegistration } from "../middlewares";
 import { loginMiddleware } from "../middlewares/login";
+import type { Request, Response } from "express";
 
 export default class NewRoutes {
   init() {
@@ -14,7 +15,11 @@ export default class NewRoutes {
     const errandsController = new MensagensController();
 
     router.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs))
-    
+  
+    router.get("/", (req: Request, res: Response) => {
+      return res.send("application running successfully");
+    });
+
     router.post("/auth", loginMiddleware, userController.authenticate);
     router.post("/user", checkRegistration, userController.store);
     router.get("/user/:id", authMiddleware, userController.index);
