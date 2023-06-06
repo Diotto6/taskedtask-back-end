@@ -11,32 +11,26 @@ export async function loginMiddleware(
   response: Response,
   next: NextFunction
 ) {
-  const { email, password } = request.body.data;
+  const { email, password } = request.body.data || request.body;
   const service = new UserRepository();
   const users = await service.find(email);
   const user = users.find((user) => user.email === email);
 
   if (!email || !password) {
-    return response
-      .json({
-        ok: false,
-        message: "Preencha os campos obrigatórios!",
-      })
-      .status(HttpBadRequestCode);
+    return response.status(HttpBadRequestCode).json({
+      ok: false,
+      message: "Preencha os campos obrigatórios!",
+    })
   }
   if (user) {
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      return response
-        .json({ ok: false, message: "Email ou senha incorretos" })
-        .status(HttpBadRequestCode);
+      return response.status(HttpBadRequestCode).json({ ok: false, message: "Email ou senha incorretos" })
     }
   }
 
   if (!user) {
-    return response
-      .json({ ok: false, message: "Email ou senha incorretos" })
-      .status(HttpBadRequestCode);
+    return response.status(HttpBadRequestCode).json({ ok: false, message: "Email ou senha incorretos" })
   }
 
   next();

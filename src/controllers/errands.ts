@@ -3,9 +3,11 @@ import { HttpError } from "../errors";
 import {
   createMessage,
   defaultErrorMessage,
+  HttpBadRequestCode,
   httpCreatedCode,
   HttpInternalErrorCode,
   httpSucessCode,
+  HttpUnauthorized,
 } from "../constants";
 import { ErrandEntity, UserEntity } from "../database/entities";
 import { ErrandRepository } from "../database/repositories";
@@ -23,12 +25,15 @@ export default class ErrandController {
           userId: errand.userId,
         };
       });
-      if (errand)
-        return response
-          .json(
-            { data: errand, ok: true }
-          )
-          .status(201);
+      if (errand) {
+        return response.status(httpSucessCode).json(
+          { data: errand, ok: true }
+        )
+      } else {
+        return response.status(HttpBadRequestCode).json(
+          { data: [], ok: false }
+        )
+      }
     } catch (error) {
       throw new HttpError(defaultErrorMessage, HttpInternalErrorCode);
     }
@@ -36,12 +41,13 @@ export default class ErrandController {
 
   async store(request: Request, response: Response) {
     const { userId } = request.params;
-    const { message } = request.body;
+    const { message } = request.body || request.body.data;
     const service = new ErrandRepository();
     const user = await service.find(userId);
     const userAuth = user?.filter((user) => user.userId === userId);
+
     if (!user) {
-      return response.json("Você não está autorizado!").status(400);
+      return response.status(HttpUnauthorized).json("Você não está autorizado!")
     }
     try {
       if (userAuth) {
@@ -49,13 +55,11 @@ export default class ErrandController {
           message,
           userId,
         });
-        return response
-          .json({
-            ok: true,
-            data: messages,
-            message: createMessage("Recado criado"),
-          })
-          .status(httpCreatedCode);
+        return response.status(httpCreatedCode).json({
+          ok: true,
+          data: messages,
+          message: createMessage("Recado criado"),
+        })
       }
     } catch (error) {
       throw new HttpError(defaultErrorMessage, HttpInternalErrorCode);
@@ -66,20 +70,25 @@ export default class ErrandController {
     const { id, userId } = request.params;
     const { message } = request.body;
     const service = new ErrandRepository();
+    const messageId = await service.findOne(id)
     try {
-      await service.update({
-        id,
-        message,
-        userId,
-      });
-      return response
-        .json({
+      if (messageId) {
+        await service.update({
+          id,
+          message,
+          userId,
+        });
+        return response.status(httpCreatedCode).json({
           ok: true,
           message: createMessage("Recado alterado"),
-        })
-        .status(httpCreatedCode);
+        });
+      } else {
+        return response.status(HttpBadRequestCode).json({
+          ok: false,
+          message: { message: "Recado não encontrado" },
+        });
+      }
     } catch (error) {
-      console.error(error);
       throw new HttpError(defaultErrorMessage, HttpInternalErrorCode);
     }
   }
@@ -87,15 +96,21 @@ export default class ErrandController {
   async delete(request: Request, response: Response) {
     const { id } = request.params;
     const service = new ErrandRepository();
+    const message = await service.findOne(id)
     try {
-      await service.delete(id);
+      if (message) {
+        await service.delete(id);
 
-      return response
-        .json({
+        return response.status(httpSucessCode).json({
           ok: true,
           message: createMessage("Recado deletado"),
-        })
-        .status(httpSucessCode);
+        });
+      } else {
+        return response.status(HttpBadRequestCode).json({
+          ok: false,
+          message: { message: "Recado não encontrado" },
+        });
+      }
     } catch (error) {
       throw new HttpError(defaultErrorMessage, HttpInternalErrorCode);
     }

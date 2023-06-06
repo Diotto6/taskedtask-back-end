@@ -2,32 +2,33 @@ import { Request, Response } from "express";
 import { HttpError } from "../errors";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-
 import {
   defaultErrorMessage,
+  HttpBadRequestCode,
   httpCreatedCode,
   HttpInternalErrorCode,
+  httpSucessCode,
 } from "../constants";
 import { UserEntity } from "../database/entities";
 import { UserRepository } from "../database/repositories";
+import { v4 as uuidV4 } from 'uuid'
 
 export default class UserController {
   async index(request: Request, response: Response) {
     const { id } = request.params
     const service = await UserEntity.find({ where: { id: id } });
     const user = service.find((user) => user.id === id);
-
     try {
       if (user) {
-        return response.json({
+        return response.status(httpSucessCode).json({
           ok: true,
-          message: "",
+          message: "Dados do usuário buscado com sucesso",
           data: {
             user,
           }
         });
       } else {
-        return response.json({
+        return response.status(HttpBadRequestCode).json({
           ok: false,
           message: "Erro ao buscar dados do usuario",
           data: {}
@@ -41,7 +42,7 @@ export default class UserController {
 
   async store(request: Request, response: Response) {
     const { firstName, lastName, email, password, passwordConfirm } =
-      request.body.data;
+      request.body.data || request.body;
 
     const service = new UserRepository();
 
@@ -54,20 +55,19 @@ export default class UserController {
         passwordConfirm: passwordConfirm,
       });
 
-      return response
-        .json({
-          ok: true,
-          message: "Conta cadastrada com sucesso",
-          data: { user }
-        })
-        .status(httpCreatedCode);
+      return response.status(httpCreatedCode).json({
+        ok: true,
+        message: "Conta cadastrada com sucesso",
+        data: { user }
+      })
+
     } catch (error) {
       throw new HttpError(defaultErrorMessage, HttpInternalErrorCode);
     }
   }
 
   async authenticate(request: Request, response: Response) {
-    const { email } = request.body.data;
+    const { email } = request.body.data || request.body;
     const service = await UserEntity.find({ where: { email: email } });
     const user = service.find((user) => user.email === email);
 
@@ -78,7 +78,7 @@ export default class UserController {
         { expiresIn: process.env.JWT_EXPIRES }
       );
 
-      return response.json({
+      return response.status(httpSucessCode).json({
         ok: true,
         email,
         message: "Logado com sucesso!",

@@ -1,4 +1,3 @@
-import { request, Request, response, Response } from "express";
 import { Router } from "express";
 import UserController from "../controllers/user";
 import MensagensController from "../controllers/errands";
@@ -11,14 +10,9 @@ export default class NewRoutes {
     const userController = new UserController();
     const errandsController = new MensagensController();
 
-    router.get("/", (req: Request, res: Response) => {
-      return res.send("application running successfully");
-    });
-
     router.post("/auth", loginMiddleware, userController.authenticate);
     router.post("/user", checkRegistration, userController.store);
     router.get("/user/:id", authMiddleware, userController.index);
-
 
     router.use(authMiddleware)
     router.get("/messages/:userId", errandsController.index);

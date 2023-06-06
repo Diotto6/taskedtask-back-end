@@ -7,19 +7,17 @@ export async function checkRegistration(
   response: Response,
   next: NextFunction
 ) {
-  const { email } = request.body.data;
+  const { email } = request.body.data || request.body;
 
   const service = new UserRepository();
   const users = await service.find(email);
   const userCreate = users.find((user) => user.email === email);
 
   if (userCreate) {
-    return response
-      .json({
-        ok: false,
-        message: "Email ja está cadastrado!",
-      })
-      .status(HttpBadRequestCode);
+    return response.status(HttpBadRequestCode).json({
+      ok: false,
+      message: "Email ja está cadastrado!",
+    })
   }
 
   next();

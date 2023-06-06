@@ -11,11 +11,7 @@ export function authMiddleware(
   const { authorization } = request.headers;
 
   if (!authorization) {
-
-    return response
-
-      .json({ message: "Não autorizado(a)", ok: false })
-      .sendStatus(HttpUnauthorized);
+    return response.status(HttpUnauthorized).json({ message: "Não autorizado(a)", ok: false })
   }
 
   const token = authorization.replace("Bearer", "").trim();
@@ -28,6 +24,6 @@ export function authMiddleware(
 
     next();
   } catch {
-    return response.sendStatus(HttpUnauthorized);
+    return response.status(HttpUnauthorized);
   }
 }
