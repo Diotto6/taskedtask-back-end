@@ -16,6 +16,9 @@ class NewRoutes {
         const userController = new user_1.default();
         const errandsController = new errands_1.default();
         router.use("/docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_json_1.default));
+        router.get("/", (req, res) => {
+            return res.send("application running successfully");
+        });
         router.post("/auth", login_1.loginMiddleware, userController.authenticate);
         router.post("/user", middlewares_1.checkRegistration, userController.store);
         router.get("/user/:id", middlewares_1.authMiddleware, userController.index);
